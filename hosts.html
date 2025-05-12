@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Từ điển Sinh học THCS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Thêm CSS tùy chỉnh nếu cần */
+        body {
+            font-family: 'Inter', sans-serif; /* Sử dụng font Inter */
+            background-color: #f0f4f8; /* Màu nền nhẹ nhàng */
+            color: #333; /* Màu chữ chính */
+        }
+        .container {
+            max-width: 1000px; /* Giới hạn chiều rộng nội dung */
+        }
+        #term-list {
+            max-height: 500px; /* Giới hạn chiều cao danh sách thuật ngữ */
+            overflow-y: auto; /* Thêm thanh cuộn khi danh sách dài */
+        }
+        .term-item {
+            cursor: pointer; /* Biến đổi con trỏ chuột khi rê qua */
+            transition: background-color 0.2s ease; /* Hiệu ứng chuyển màu nền */
+        }
+        .term-item:hover {
+            background-color: #e2e8f0; /* Màu nền khi rê chuột qua */
+        }
+        #explanation-image {
+            max-width: 100%; /* Đảm bảo ảnh không vượt quá chiều rộng khung */
+            height: auto; /* Giữ tỷ lệ ảnh */
+            border-radius: 8px; /* Bo tròn góc ảnh */
+            margin-top: 16px; /* Khoảng cách trên ảnh */
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-center mb-6 text-blue-700">Từ điển Sinh học THCS</h1>
+
+        <div class="mb-6">
+            <input type="text" id="search-input" placeholder="Nhập thuật ngữ cần tìm..."
+                   class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div id="term-list" class="border rounded-md p-4 bg-gray-50">
+                <h2 class="text-lg font-semibold mb-4 text-gray-700">Danh sách Thuật ngữ</h2>
+                </div>
+
+            <div id="explanation-area" class="border rounded-md p-4 bg-blue-50">
+                <h2 class="text-lg font-semibold mb-4 text-blue-700">Giải thích</h2>
+                <p class="text-gray-600">Chọn một thuật ngữ từ danh sách hoặc sử dụng ô tìm kiếm.</p>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu 40 thuật ngữ Sinh học
+        // ** LƯU Ý: Đây là dữ liệu mẫu. Bạn cần thay thế và thêm đủ 40 thuật ngữ của mình vào đây. **
+        // ** Mỗi đối tượng trong mảng là một thuật ngữ với 'term' (tên) và 'explanation' (giải thích). **
+        // ** Bạn có thể thêm 'image' (đường dẫn ảnh) nếu có. **
+        const biologyTerms = [
+            {
+                term: "Tế bào",
+                explanation: "Đơn vị cấu tạo cơ bản nhất của mọi cơ thể sống, có khả năng thực hiện các chức năng sống cơ bản như trao đổi chất, sinh trưởng, sinh sản.",
+                image:"istockphoto-1370146608-612x612.jpg"
+            },
+            {
+                term: "Quang hợp",
+                explanation: "Quá trình thực vật sử dụng năng lượng ánh sáng mặt trời để tổng hợp chất hữu cơ từ khí carbon dioxide và nước, đồng thời giải phóng khí oxygen.",
+                image: "https://placehold.co/300x200/b2f0b2/000?text=Quang+hợp" // Ảnh minh họa mẫu
+            },
+            {
+                term: "Hô hấp",
+                explanation: "Quá trình trao đổi khí giữa cơ thể và môi trường, giúp cơ thể lấy oxygen và thải carbon dioxide.",
+                image: "https://placehold.co/300x200/ffb2b2/000?text=Hô+hấp" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Tuần hoàn",
+                explanation: "Hệ thống vận chuyển máu và các chất dinh dưỡng, oxygen đến các tế bào trong cơ thể và mang chất thải đi.",
+                image: "https://placehold.co/300x200/ffb2ff/000?text=Tuần+hoàn" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Tiêu hóa",
+                explanation: "Quá trình biến đổi thức ăn thành các chất đơn giản mà cơ thể có thể hấp thụ được.",
+                image: "https://placehold.co/300x200/ffffb2/000?text=Tiêu+hóa" // Ảnh minh họa mẫu
+            },
+            // ** Thêm 35 thuật ngữ còn lại của bạn vào đây theo cấu trúc tương tự **
+             {
+                term: "Hệ sinh thái",
+                explanation: "Bao gồm quần xã sinh vật và môi trường sống của chúng, luôn có sự tương tác qua lại giữa các thành phần.",
+                image: "https://placehold.co/300x200/b2ffff/000?text=Hệ+sinh+thái" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Quần thể",
+                explanation: "Tập hợp các cá thể cùng loài, sống trong một khu vực nhất định, vào một thời điểm nhất định và có khả năng sinh sản tạo ra thế hệ mới.",
+                image: "https://placehold.co/300x200/c9b2ff/000?text=Quần+thể" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Quần xã",
+                explanation: "Tập hợp nhiều quần thể sinh vật thuộc các loài khác nhau, cùng sống trong một khu vực nhất định và có mối quan hệ tương tác với nhau.",
+                image: "https://placehold.co/300x200/ffc9b2/000?text=Quần+xã" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Môi trường",
+                explanation: "Là tất cả những gì xung quanh sinh vật, có ảnh hưởng trực tiếp hoặc gián tiếp đến sự tồn tại và phát triển của sinh vật.",
+                image: "https://placehold.co/300x200/b2ffc9/000?text=Môi+trường" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Thực vật",
+                explanation: "Nhóm sinh vật có khả năng tự dưỡng bằng cách thực hiện quá trình quang hợp.",
+                image: "https://placehold.co/300x200/c9ffb2/000?text=Thực+vật" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Động vật",
+                explanation: "Nhóm sinh vật dị dưỡng, có khả năng di chuyển và phản ứng nhanh với môi trường.",
+                image: "https://placehold.co/300x200/ffb2c9/000?text=Động+vật" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Nấm",
+                explanation: "Nhóm sinh vật dị dưỡng, phân hủy chất hữu cơ trong môi trường.",
+                image: "https://placehold.co/300x200/b2c9ff/000?text=Nấm" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Vi khuẩn",
+                explanation: "Sinh vật đơn bào, có cấu tạo rất đơn giản, kích thước hiển vi.",
+                image: "https://placehold.co/300x200/c9ffc9/000?text=Vi+khuẩn" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Virus",
+                explanation: "Sinh vật kích thước siêu nhỏ, sống ký sinh bắt buộc trong tế bào vật chủ.",
+                image: "https://placehold.co/300x200/ffc9ff/000?text=Virus" // Ảnh minh họa mẫu
+            },
+             {
+                term: "ADN",
+                explanation: "Phân tử mang thông tin di truyền chính ở hầu hết các sinh vật.",
+                image: "https://placehold.co/300x200/c9b2b2/000?text=ADN" // Ảnh minh họa mẫu
+            },
+             {
+                term: "Gen",
+                explanation: "Một đoạn của phân tử ADN mang thông tin quy định một tính trạng nào đó.",
+                image: "https://placehold.co/300x200/b2c9c9/000?text=Gen" // Ảnh minh họa mẫu
+            },
+            // ... Thêm các thuật ngữ khác
+        ];
+
+        const searchInput = document.getElementById('search-input');
+        const termListDiv = document.getElementById('term-list');
+        const explanationAreaDiv = document.getElementById('explanation-area');
+
+        // Hàm hiển thị danh sách thuật ngữ
+        function displayTerms(termsToDisplay) {
+            termListDiv.innerHTML = '<h2 class="text-lg font-semibold mb-4 text-gray-700">Danh sách Thuật ngữ</h2>'; // Reset và thêm lại tiêu đề
+            if (termsToDisplay.length === 0) {
+                termListDiv.innerHTML += '<p class="text-gray-500">Không tìm thấy thuật ngữ nào.</p>';
+                return;
+            }
+            termsToDisplay.forEach(termData => {
+                const termItem = document.createElement('div');
+                termItem.classList.add('term-item', 'p-2', 'rounded-md', 'mb-1'); // Thêm class Tailwind cho padding, bo góc, margin
+                termItem.textContent = termData.term;
+                termItem.addEventListener('click', () => displayExplanation(termData));
+                termListDiv.appendChild(termItem);
+            });
+        }
+
+        // Hàm hiển thị giải thích chi tiết
+        function displayExplanation(termData) {
+            explanationAreaDiv.innerHTML = `<h2 class="text-xl font-bold mb-4 text-blue-700">${termData.term}</h2><p class="text-gray-700">${termData.explanation}</p>`;
+            if (termData.image) {
+                const img = document.createElement('img');
+                img.src = termData.image;
+                img.id = 'explanation-image';
+                img.alt = `Hình ảnh minh họa cho ${termData.term}`; // Thêm alt text cho ảnh
+                explanationAreaDiv.appendChild(img);
+            }
+        }
+
+        // Xử lý sự kiện khi người dùng nhập vào ô tìm kiếm
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase(); // Lấy từ khóa tìm kiếm và chuyển về chữ thường
+            const filteredTerms = biologyTerms.filter(termData =>
+                // Lọc các thuật ngữ có tên chứa từ khóa tìm kiếm (không phân biệt chữ hoa/thường)
+                termData.term.toLowerCase().includes(searchTerm)
+            );
+            displayTerms(filteredTerms); // Hiển thị danh sách đã lọc
+        });
+
+        // Hiển thị tất cả thuật ngữ khi trang web được tải lần đầu
+        displayTerms(biologyTerms);
+
+    </script>
+
+</body>
+</html>
